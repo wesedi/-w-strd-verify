@@ -1,0 +1,1 @@
+# -w-strd-verify
