@@ -51,7 +51,7 @@ footer{padding:3rem 1.25rem 4rem;text-align:center;color:var(--dim);font-size:1r
   <div class="legend"><span><i class="h"></i>Where it starts</span><span><i></i>Wearers</span></div>
 </section>
 <p class="rule">Pinned by city only, never a street and never a name. Nobody appears here unless they asked to.</p>
-<footer>[w]strd. Mahikeng</footer>
+<footer>[w]strd. Mahikeng &nbsp;&nbsp; <a href="shop.html">Shop</a></footer>
 
 <script>
 const GRID="AAAAAAYd8P///wAA+AAAAAA8AAAAAAAAAAAwAnw////4AAIAAAAAAGAAAAAAAAAAADivwAf//wAAAAADAAf/wAHYAAAAAADoi3sAP//gAAAAAMAD///sAAAAgBgACfwz/AD/+gAAA4AEHf///+/8gBAP/7/nJdjwD/+AAAH/AA7f///////f4P//////h8H/gAAAf/6//f////////Mf/////9H4D8AeAA+ev///////////AP/////4A0B4AAAD5/////////////Af3////gHgA4AAAH5///////////LwAHgH///gHkAAAAAH4/////////+CIAABAB///4D+AAAAGCx/////////4A8AAIAAf///n/gAAAOCD/////////wA4AAAAAf///n/wAAAbP///////////AgAAAAAP/////wAAADf//////////9AAAAAAAF////0YAAAB///////////9AAAAAAAD////8EAAAB///////////5AAAAAAAD////2AAAAB/f5fP//////wAAAAAAAD////gAAAAfxnwPP//////jAAAAAAAD////AAAAAPCb3/n/////+CAAAAAAAD///8AAAAAfALf/n////+ECAAAAAAAB///8AAAAAGHQP/n/////mMAAAAAAAA///8AAAAAH+Ai///////E8AAAAAAAAf//wAAAAAP/AA///////BgAAAAAAAAP//gAAAAAf/73///////gAAAAAAAAAD/AQAAAAAf////f/////gAAAAAAAAAF+AQAAAAB///+/n/////AAAAAAAAAAC+AAAAAAB///+f0H////AAAAAAAAAAAeAwAAAAD////f/B///8gAAAAAAAAAAeGEAAAAH////v+B/z/AAAAAAAAAAAAPMAgAAAD////n+A/B+gAAAAAAAAAAAD8AAAAAD////n4AeB/AgAAAAAAAAAAAPAAAAAH////3gAcAfAgAAAAAAAAAAADAAAAAD////6AAcAfggAAAAAAAAAAABDwAAAD////8wAMATAIAAAAAAAAAAAAr/AAAB/////gAKASAAAAAAAAAAAAAAH/gAAA/////gACAAAIAAAAAAAAAAAAH/8AAAaH///AAAAsGAAAAAAAAAAAAAH/+AAAAB//+AAAAUOAAAAAAAAAAAAAP/+AAAAB//8AAAAYegAAAAAAAAAAAAP//gAAAD//4AAAAMeBgAAAAAAAAAAAP//8AAAB//wAAAAGdiuAAAAAAAAAAAf///AAAA//wAAAACAQHgAAAAAAAAAAP///gAAA//wAAAABwAHwgAAAAAAAAAH///AAAA//wAAAAACIDQIAAAAAAAAAH//+AAAAf/wAAAAAAAAAAAAAAAAAAAD//+AAAA//wgAAAAABxAAAAAAAAAAAD//+AAAA//wgAAAAAPxgBAAAAAAAAAA//8AAAA//jgAAAAAf5gAAAAAAAAAAAf/8AAAA//DgAAAAAf/gAAAAAAAAAAAf/8AAAAf/DAAAAAD//4CAAAAAAAAAAf/wAAAAf/DAAAAAH//4AAAAAAAAAAAf/AAAAAf+CAAAAAH//8AAAAAAAAAAAf/AAAAAP8AAAAAAH//+AAAAAAAAAAA/+AAAAAP8AAAAAAH//+AAAAAAAAAAA/+AAAAAH4AAAAAAD//+AAAAAAAAAAA/8AAAAAHwAAAAAADwf8AAAAAAAAAAA/gAAAAAAAAAAAAACAH4AIAAAAAAAAB/wAAAAAAAAAAAAAAAD4AEAAAAAAAAB+AAAAAAAAAAAAAAAAAAAGAAAAAAAAB6AAAAAAAAAAAAAAAAAwAMAAAAAAAAA8AAAAAAAAAAAAAAAAAQAYAAAAAAAAB4AAAAAAAAAAAAAAAAAAAwAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAACAAAAAAAAAAAAAAAAADgAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",C=180,R=69;
@@ -70,17 +70,23 @@ function draw(){
   for(let i=0;i<R;i++)for(let j=0;j<C;j++)if(bits[i*C+j]){x.beginPath();x.arc((j+.5)*cw,(i+.5)*ch,r,0,6.2832);x.fill()}
 }
 new ResizeObserver(draw).observe(map);draw();
+const SB_URL="https://pmzbygzorusmoewoutzh.supabase.co",SB_KEY="sb_publishable_DwaQ3eh0nGZ20IEIs_9tsQ_lP2K4ZfT";
 const list=document.getElementById("cities");
-PINS.forEach(p=>{
+const em=document.createElement("li");em.id="empty";em.textContent="The first pin outside Mahikeng is yours.";list.appendChild(em);
+function addPin(p){
   const b=document.createElement("button");
   b.className="pin"+(p.home?" home":"");b.type="button";b.setAttribute("aria-label",p.c);
   b.style.left=((p.lon+180)/360*100)+"%";b.style.top=((80-p.lat)/138*100)+"%";
-  b.innerHTML="<span>"+p.c+"</span>";map.appendChild(b);
+  const s=document.createElement("span");s.textContent=p.c;b.appendChild(s);map.appendChild(b);
   if(!p.home){const li=document.createElement("li");li.textContent=p.c;list.appendChild(li)}
-});
-const n=PINS.filter(p=>!p.home).length;
-document.getElementById("count").textContent=n?(n+(n===1?" CITY PINNED":" CITIES PINNED")):"NO ONE PINNED YET";
-if(!n){const li=document.createElement("li");li.textContent="The first pin outside Mahikeng is yours.";list.appendChild(li)}
+}
+function summary(){
+  const n=PINS.filter(p=>!p.home).length;
+  document.getElementById("count").textContent=n?(n+(n===1?" CITY PINNED":" CITIES PINNED")):"NO ONE PINNED YET";
+  em.hidden=n>0;
+}
+PINS.forEach(addPin);summary();
+if(SB_URL&&SB_KEY)fetch(SB_URL+"/rest/v1/pins?select=city,lat,lon&approved=eq.true",{headers:{apikey:SB_KEY,...(SB_KEY.startsWith("eyJ")?{Authorization:"Bearer "+SB_KEY}:{})}}).then(r=>r.ok?r.json():[]).then(rows=>{rows.forEach(r=>{const p={c:r.city,lat:r.lat,lon:r.lon};PINS.push(p);addPin(p)});summary()}).catch(()=>{});
 </script>
 </body>
 </html>

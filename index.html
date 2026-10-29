@@ -50,6 +50,15 @@ body{background:var(--black);color:var(--bone);font-family:var(--serif);font-siz
 .ok .facts{animation:rise .6s .7s both}
 @keyframes wipe{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0)}}
 @keyframes rise{from{opacity:0}to{opacity:1}}}
+.pinbox{margin:2rem auto 0;border-top:1px solid #000;padding-top:1.5rem}
+.pinbox h2{font:800 1rem var(--sans);letter-spacing:.08em;margin:0 0 .5rem}
+.pinbox p{margin:0 0 1rem;font-size:1.05rem;line-height:1.4}
+.pinbox .row{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
+.pinbox input{flex:1 1 11rem;background:none;border:1px solid #000;color:#000;font:1.05rem var(--serif);padding:.75rem 1rem}
+.pinbox input::placeholder{color:#5a2f10}
+.pinbox button{background:#000;color:var(--orange);border:0;font:800 .85rem var(--sans);letter-spacing:.1em;padding:.75rem 1.3rem;cursor:pointer}
+.pinbox button:disabled{opacity:.5;cursor:default}
+.pinbox .msg{margin:.75rem 0 0;font-style:italic;min-height:1.4em}
 </style>
 </head>
 <body>
@@ -63,7 +72,7 @@ body{background:var(--black);color:var(--bone);font-family:var(--serif);font-siz
       <input id="code" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Authentication code">
       <button id="go" type="button">Verify</button>
     </div>
-    <p class="small"><a href="world.html">[w]orld</a> &nbsp;&nbsp; <a href="https://wsterd.myshopify.com" target="_blank" rel="noopener">Shop Season 01</a></p>
+    <p class="small"><a href="shop.html">Shop</a> &nbsp;&nbsp; <a href="world.html">[w]orld</a></p>
   </div>
 </main>
 
@@ -76,6 +85,12 @@ body{background:var(--black);color:var(--bone);font-family:var(--serif);font-siz
       <p class="piece" id="piece"></p>
       <p class="meta" id="meta"></p>
       <p class="note">This tag is registered to this one piece and no other. Its code matched our records in Mahikeng, which means this shirt is genuine [w]strd. If a tag ever shows you anything else, it didn’t come from us.</p>
+      <div class="pinbox" id="pinbox" hidden>
+        <h2>PIN ME TO [W]ORLD</h2>
+        <p>Add your city to the map. City only, never your name or address. It appears once we approve it.</p>
+        <div class="row"><input id="pcity" placeholder="Your city" maxlength="60" autocomplete="off" aria-label="Your city"><button id="pbtn" type="button">PIN ME</button></div>
+        <p class="msg" id="pmsg" role="status"></p>
+      </div>
     </div>
     <button class="again" id="again" type="button">Check another piece</button>
   </div>
@@ -109,6 +124,7 @@ async function verify(raw){
   if(hit){
     $("piece").textContent=DB.names[hit[0]];
     $("meta").textContent=hit[0]+", unit "+hit[1];
+    window.CODE=c;initPin();
     show("ok")
   }else{
     $("noTitle").textContent="We can’t verify this piece";
@@ -116,6 +132,23 @@ async function verify(raw){
     show("no")}
 }
 function fromHash(){verify(decodeURIComponent((location.hash||"").slice(1)))}
+const SB_URL="https://pmzbygzorusmoewoutzh.supabase.co",SB_KEY="sb_publishable_DwaQ3eh0nGZ20IEIs_9tsQ_lP2K4ZfT";
+function initPin(){$("pinbox").hidden=!(SB_URL&&SB_KEY);$("pmsg").textContent="";$("pcity").value="";$("pbtn").disabled=false}
+$("pbtn").addEventListener("click",async()=>{
+  const name=$("pcity").value.trim(),m=$("pmsg");
+  if(name.length<2){m.textContent="Type your city first.";return}
+  $("pbtn").disabled=true;m.textContent="Finding your city…";
+  try{
+    const g=await(await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&name="+encodeURIComponent(name))).json();
+    const r=g.results&&g.results[0];
+    if(!r){m.textContent="We couldn’t find that city. Try the nearest big one.";$("pbtn").disabled=false;return}
+    const key=await sha("pin:"+window.CODE);
+    const res=await fetch(SB_URL+"/rest/v1/pins",{method:"POST",headers:{"Content-Type":"application/json",apikey:SB_KEY,...(SB_KEY.startsWith("eyJ")?{Authorization:"Bearer "+SB_KEY}:{}),Prefer:"return=minimal"},body:JSON.stringify({key_hash:key,city:r.name,country:r.country||null,lat:Math.round(r.latitude*10)/10,lon:Math.round(r.longitude*10)/10})});
+    if(res.status===409){m.textContent="This piece is already pinned.";return}
+    if(!res.ok)throw 0;
+    m.textContent="Done. "+r.name+" will appear once approved."
+  }catch(e){m.textContent="Something went wrong. Try again in a minute.";$("pbtn").disabled=false}
+});
 $("go").addEventListener("click",()=>verify($("code").value));
 $("code").addEventListener("keydown",e=>{if(e.key==="Enter")verify($("code").value)});
 $("again").addEventListener("click",()=>{$("code").value="";show("idle")});
