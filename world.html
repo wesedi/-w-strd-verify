@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>[w]orld | Where [w]strd. is worn</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;800&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#ff7a1f;--bone:#ece5d6;--dim:#8d887c;--sans:"Montserrat","Helvetica Neue",Arial,sans-serif;--serif:"EB Garamond",Georgia,serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:#000;color:var(--bone);font-family:var(--serif);font-size:1.25rem;line-height:1.5}
+a{color:inherit}:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+nav{padding:1.25rem clamp(1.25rem,4vw,3rem)}
+nav a{font-family:var(--sans);font-weight:800;letter-spacing:.2em;font-size:.95rem;text-decoration:none}
+header{text-align:center;padding:2rem 1.25rem 1rem}
+h1{font-family:var(--sans);font-weight:800;letter-spacing:.2em;padding-left:.2em;font-size:clamp(1.8rem,7vw,3.2rem);color:var(--orange);margin:0}
+header p{margin:.75rem auto 0;max-width:34ch;color:#cfc8b8}
+.map{position:relative;width:min(100% - 2rem,1200px);margin:2rem auto 0;aspect-ratio:180/69}
+.map canvas{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--orange);border:0;padding:0;cursor:pointer}
+.pin.home{background:var(--bone)}
+.pin::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid var(--orange);opacity:0}
+.pin.home::before{border-color:var(--bone)}
+.pin span{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);white-space:nowrap;font:italic 1rem var(--serif);color:var(--bone);background:#000;padding:2px 8px;border:1px solid #333;opacity:0;pointer-events:none;transition:opacity .15s}
+.pin:hover span,.pin:focus-visible span,.pin.home span{opacity:1}
+@media(prefers-reduced-motion:no-preference){.pin::before{animation:ping 2.4s ease-out infinite}
+@keyframes ping{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.6);opacity:0}}}
+.info{text-align:center;padding:2.5rem 1.25rem 1rem}
+.count{font-family:var(--sans);font-weight:800;letter-spacing:.08em;font-size:1rem;margin:0}
+.cities{list-style:none;margin:1rem auto 0;padding:0;display:flex;flex-wrap:wrap;gap:.25rem 1.5rem;justify-content:center;color:var(--dim);font-style:italic}
+.legend{display:flex;gap:1.5rem;justify-content:center;margin-top:1.5rem;color:var(--dim);font-size:1rem}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.5rem;background:var(--orange)}
+.legend i.h{background:var(--bone)}
+.rule{max-width:44ch;margin:2.5rem auto 0;padding:0 1.25rem;text-align:center;color:var(--dim);font-size:1.05rem}
+footer{padding:3rem 1.25rem 4rem;text-align:center;color:var(--dim);font-size:1rem}
+</style>
+</head>
+<body>
+<nav><a href="./" aria-label="Back to [w]strd. verification">[W]STRD.</a></nav>
+<header>
+  <h1>[W]ORLD.</h1>
+  <p>Everyone wearing [w]strd., pinned by city.</p>
+</header>
+
+<div class="map" id="map"><canvas id="cv" aria-hidden="true"></canvas></div>
+
+<section class="info">
+  <p class="count" id="count"></p>
+  <ul class="cities" id="cities"></ul>
+  <div class="legend"><span><i class="h"></i>Where it starts</span><span><i></i>Wearers</span></div>
+</section>
+<p class="rule">Pinned by city only, never a street and never a name. Nobody appears here unless they asked to.</p>
+<footer>[w]strd. Mahikeng</footer>
+
+<script>
+const GRID="AAAAAAYd8P///wAA+AAAAAA8AAAAAAAAAAAwAnw////4AAIAAAAAAGAAAAAAAAAAADivwAf//wAAAAADAAf/wAHYAAAAAADoi3sAP//gAAAAAMAD///sAAAAgBgACfwz/AD/+gAAA4AEHf///+/8gBAP/7/nJdjwD/+AAAH/AA7f///////f4P//////h8H/gAAAf/6//f////////Mf/////9H4D8AeAA+ev///////////AP/////4A0B4AAAD5/////////////Af3////gHgA4AAAH5///////////LwAHgH///gHkAAAAAH4/////////+CIAABAB///4D+AAAAGCx/////////4A8AAIAAf///n/gAAAOCD/////////wA4AAAAAf///n/wAAAbP///////////AgAAAAAP/////wAAADf//////////9AAAAAAAF////0YAAAB///////////9AAAAAAAD////8EAAAB///////////5AAAAAAAD////2AAAAB/f5fP//////wAAAAAAAD////gAAAAfxnwPP//////jAAAAAAAD////AAAAAPCb3/n/////+CAAAAAAAD///8AAAAAfALf/n////+ECAAAAAAAB///8AAAAAGHQP/n/////mMAAAAAAAA///8AAAAAH+Ai///////E8AAAAAAAAf//wAAAAAP/AA///////BgAAAAAAAAP//gAAAAAf/73///////gAAAAAAAAAD/AQAAAAAf////f/////gAAAAAAAAAF+AQAAAAB///+/n/////AAAAAAAAAAC+AAAAAAB///+f0H////AAAAAAAAAAAeAwAAAAD////f/B///8gAAAAAAAAAAeGEAAAAH////v+B/z/AAAAAAAAAAAAPMAgAAAD////n+A/B+gAAAAAAAAAAAD8AAAAAD////n4AeB/AgAAAAAAAAAAAPAAAAAH////3gAcAfAgAAAAAAAAAAADAAAAAD////6AAcAfggAAAAAAAAAAABDwAAAD////8wAMATAIAAAAAAAAAAAAr/AAAB/////gAKASAAAAAAAAAAAAAAH/gAAA/////gACAAAIAAAAAAAAAAAAH/8AAAaH///AAAAsGAAAAAAAAAAAAAH/+AAAAB//+AAAAUOAAAAAAAAAAAAAP/+AAAAB//8AAAAYegAAAAAAAAAAAAP//gAAAD//4AAAAMeBgAAAAAAAAAAAP//8AAAB//wAAAAGdiuAAAAAAAAAAAf///AAAA//wAAAACAQHgAAAAAAAAAAP///gAAA//wAAAABwAHwgAAAAAAAAAH///AAAA//wAAAAACIDQIAAAAAAAAAH//+AAAAf/wAAAAAAAAAAAAAAAAAAAD//+AAAA//wgAAAAABxAAAAAAAAAAAD//+AAAA//wgAAAAAPxgBAAAAAAAAAA//8AAAA//jgAAAAAf5gAAAAAAAAAAAf/8AAAA//DgAAAAAf/gAAAAAAAAAAAf/8AAAAf/DAAAAAD//4CAAAAAAAAAAf/wAAAAf/DAAAAAH//4AAAAAAAAAAAf/AAAAAf+CAAAAAH//8AAAAAAAAAAAf/AAAAAP8AAAAAAH//+AAAAAAAAAAA/+AAAAAP8AAAAAAH//+AAAAAAAAAAA/+AAAAAH4AAAAAAD//+AAAAAAAAAAA/8AAAAAHwAAAAAADwf8AAAAAAAAAAA/gAAAAAAAAAAAAACAH4AIAAAAAAAAB/wAAAAAAAAAAAAAAAD4AEAAAAAAAAB+AAAAAAAAAAAAAAAAAAAGAAAAAAAAB6AAAAAAAAAAAAAAAAAwAMAAAAAAAAA8AAAAAAAAAAAAAAAAAQAYAAAAAAAAB4AAAAAAAAAAAAAAAAAAAwAAAAAAAAB4AAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAACAAAAAAAAAAAAAAAAADgAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",C=180,R=69;
+// Add a wearer only after they have said yes. City level only.
+const PINS=[
+  {c:"Mahikeng",lat:-25.865,lon:25.644,home:true}
+];
+const bits=(()=>{const s=atob(GRID),o=[];for(let i=0;i<s.length;i++){const b=s.charCodeAt(i);for(let j=7;j>=0;j--)o.push((b>>j)&1)}return o})();
+const cv=document.getElementById("cv"),map=document.getElementById("map");
+function draw(){
+  const w=map.clientWidth,h=map.clientHeight,d=window.devicePixelRatio||1;
+  cv.width=w*d;cv.height=h*d;
+  const x=cv.getContext("2d");x.scale(d,d);x.clearRect(0,0,w,h);
+  const cw=w/C,ch=h/R,r=Math.max(.7,cw*.34);
+  x.fillStyle="#3a3732";
+  for(let i=0;i<R;i++)for(let j=0;j<C;j++)if(bits[i*C+j]){x.beginPath();x.arc((j+.5)*cw,(i+.5)*ch,r,0,6.2832);x.fill()}
+}
+new ResizeObserver(draw).observe(map);draw();
+const list=document.getElementById("cities");
+PINS.forEach(p=>{
+  const b=document.createElement("button");
+  b.className="pin"+(p.home?" home":"");b.type="button";b.setAttribute("aria-label",p.c);
+  b.style.left=((p.lon+180)/360*100)+"%";b.style.top=((80-p.lat)/138*100)+"%";
+  b.innerHTML="<span>"+p.c+"</span>";map.appendChild(b);
+  if(!p.home){const li=document.createElement("li");li.textContent=p.c;list.appendChild(li)}
+});
+const n=PINS.filter(p=>!p.home).length;
+document.getElementById("count").textContent=n?(n+(n===1?" CITY PINNED":" CITIES PINNED")):"NO ONE PINNED YET";
+if(!n){const li=document.createElement("li");li.textContent="The first pin outside Mahikeng is yours.";list.appendChild(li)}
+</script>
+</body>
+</html>
