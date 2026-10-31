@@ -59,20 +59,30 @@ body{background:var(--black);color:var(--bone);font-family:var(--serif);font-siz
 .pinbox button{background:#000;color:var(--orange);border:0;font:800 .85rem var(--sans);letter-spacing:.1em;padding:.75rem 1.3rem;cursor:pointer}
 .pinbox button:disabled{opacity:.5;cursor:default}
 .pinbox .msg{margin:.75rem 0 0;font-style:italic;min-height:1.4em}
+:root{color-scheme:light}
+body{background:#fbf9f5;color:#111}
+.idle .mark{color:#111}
+.idle .brandcard{display:inline-block;background:var(--orange);padding:clamp(2.5rem,9vw,5.5rem) clamp(2rem,9vw,6.5rem)}
+.idle p.lead,.no p{color:#4a4740}
+.entry input{border-color:#111;color:#111}
+.entry input::placeholder{color:#9a968a}
+.entry button:hover{background:#111;color:#fff}
+.small{color:#6b675e}
+.small a{text-decoration:none;border-bottom:1px solid var(--orange)}
 </style>
 </head>
 <body>
 
 <main class="screen idle" id="idle">
   <div>
-    <h1 class="mark" aria-label="[W]STRD."><span class="br" aria-hidden="true">[W]</span><span class="rest" aria-hidden="true">STRD.</span></h1>
-    <p class="city">Mahikeng</p>
+    <div class="brandcard"><h1 class="mark" aria-label="[W]STRD."><span class="br" aria-hidden="true">[W]</span><span class="rest" aria-hidden="true">STRD.</span></h1>
+    <p class="city">Mahikeng</p></div>
     <p class="lead">Every [w]strd. piece leaves Mahikeng with its own NFC tag, registered to that piece alone. Tap the tag with your phone to confirm yours is genuine, or type its code below.</p>
     <div class="entry">
       <input id="code" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Authentication code">
       <button id="go" type="button">Verify</button>
     </div>
-    <p class="small"><a href="shop.html">Shop</a> &nbsp;&nbsp; <a href="world.html">[w]orld</a></p>
+    <p class="small"><a href="shop.html">Shop</a> &nbsp;&nbsp; <a href="world.html">[w]orld</a> &nbsp;&nbsp; <a href="world.html#events">Events</a></p>
   </div>
 </main>
 
@@ -84,7 +94,7 @@ body{background:var(--black);color:var(--bone);font-family:var(--serif);font-siz
       <p class="verdict">AUTHENTIC</p>
       <p class="piece" id="piece"></p>
       <p class="meta" id="meta"></p>
-      <p class="note">This tag is registered to this one piece and no other. Its code matched our records in Mahikeng, which means this shirt is genuine [w]strd. If a tag ever shows you anything else, it didn’t come from us.</p>
+      <p class="note">This tag is registered to this one piece and no other. Its code matched our records in Mahikeng, which means this piece is genuine [w]strd. If a tag ever shows you anything else, it didn’t come from us.</p>
       <div class="pinbox" id="pinbox" hidden>
         <h2>PIN ME TO [W]ORLD</h2>
         <p>Add your city to the map. City only, never your name or address. It appears once we approve it.</p>
@@ -109,7 +119,7 @@ body{background:var(--black);color:var(--bone);font-family:var(--serif);font-siz
 </main>
 
 <script>
-const DB={"reg":{"6006dbc46c6e6597a84be78b4c6f81dcd646036b4c8d3c4d714c2879ef71adb4":["WDT-003",1],"34a09908622a8d99565dd35aaf89ffe78a7daedf9811acd5565381f6224f16c3":["WDT-003",2],"17666dfa29c46b02b888fd810fd188d1e2f290051fb2a1054522d0db048b3023":["WDT-003",3],"6a0e4a398e0863cf7a87387c145994497fc5fad814e4bb277cde68da6557166d":["WDT-003",4],"c0ccecd15e366d11d9d00b43cb221577bc926ae8f49f2b6358b375d90a0c9eb9":["WDT-003",5],"9daad378e8f98fe60b3c973ae6e588ff70f264fb8a90c1d5745bdc7fd2976784":["WDT-003",6],"75eb106099294429f1fb60df8cce2ee1f9c8f9ea2c54887b301f6c111822a5c4":["WDT-003",7],"38bd9c08a57ae62da6a0b3ae132814c7e2c31b4930b1b46d935b603ca31f57c2":["WDT-003",8],"f7ab2f3e260358a91f27c392ccb11551e82de690a31f474072fcdd60ee4dc227":["WDT-003",9],"5fcbba125759c22452016d0c75c981dfe37976cb3e829738b5ab5afb5f2bebbe":["WDT-003",10],"eb8c10537876b8eea9a691919b983c77be57ed10fa2359f61a991aac512c6ee1":["WDT-003",11],"6b7772f3ac4f96d4bf87b4542c080201c8f967708e50c2512caacf1a159a2e22":["WDT-003",12],"64092585a1bb3670cf8866671c874547b64c7edd5ccf5ad41b46de758db94a1b":["WDT-003",13],"fc7655d717427d008faf8a18dae5a7e80c9e8c2f4891e02fae1b572269a53eef":["WDT-003",14],"252918974517975c47370c0c5e7deb0162e16d1d1e4fe0bed25866198142a87a":["WDT-003",15],"11de9433754a4170dca741fd6ea40ff411e7465501903edf5ccc658ecb301d0b":["WDT-003",16],"1c4f2b1f039b7513a856e6edd507f5d8dc721be1acd070ea7848bd716f2a6f18":["WDT-003",17],"3b5d3a0a20258333ea79b930924fb3dcdc3d127476dcf64a547729693afee9af":["WDT-003",18],"279c2dcd497a2ee7fe50f5888e2b308fb6d5cc11c5ed58692941ddd02f324122":["WDT-003",19],"9e2840df4b9fbeadb86341c534429eb3559d0299c4da1e8c63a398af01e6cdfa":["WDT-003",20],"6b4c0ab745011717e0808269c391456e9d7ffb8ccad39bc124fe6a2450396822":["WDT-003",21],"91871377044de2f34c98811071bb372475fbaccd43d2765b50c1ceb654ba5a8a":["WDT-003",22],"ca10dc0aabb60516fcc31afe4a1cdfc6540dc75da8c20911832e97a1133f1b7a":["WDT-003",23],"41949636c266e7eaca1ee8d4bc593a10c64eb2baea4361df2819da299fb0335b":["WDT-003",24],"cceca835901cdd7f4b0a00d08a2c28caa2ec49ab78f583a4c37cc88d0d10f29c":["WDT-003",25]},"names":{"WDT-003":"Mandela Tee, Black"}};
+const DB={"reg":{"6006dbc46c6e6597a84be78b4c6f81dcd646036b4c8d3c4d714c2879ef71adb4":["WDT-003",1],"34a09908622a8d99565dd35aaf89ffe78a7daedf9811acd5565381f6224f16c3":["WDT-003",2],"17666dfa29c46b02b888fd810fd188d1e2f290051fb2a1054522d0db048b3023":["WDT-003",3],"6a0e4a398e0863cf7a87387c145994497fc5fad814e4bb277cde68da6557166d":["WDT-003",4],"c0ccecd15e366d11d9d00b43cb221577bc926ae8f49f2b6358b375d90a0c9eb9":["WDT-003",5],"9daad378e8f98fe60b3c973ae6e588ff70f264fb8a90c1d5745bdc7fd2976784":["WDT-003",6],"75eb106099294429f1fb60df8cce2ee1f9c8f9ea2c54887b301f6c111822a5c4":["WDT-003",7],"38bd9c08a57ae62da6a0b3ae132814c7e2c31b4930b1b46d935b603ca31f57c2":["WDT-003",8],"f7ab2f3e260358a91f27c392ccb11551e82de690a31f474072fcdd60ee4dc227":["WDT-003",9],"5fcbba125759c22452016d0c75c981dfe37976cb3e829738b5ab5afb5f2bebbe":["WDT-003",10],"eb8c10537876b8eea9a691919b983c77be57ed10fa2359f61a991aac512c6ee1":["WDT-003",11],"6b7772f3ac4f96d4bf87b4542c080201c8f967708e50c2512caacf1a159a2e22":["WDT-003",12],"64092585a1bb3670cf8866671c874547b64c7edd5ccf5ad41b46de758db94a1b":["WDT-003",13],"fc7655d717427d008faf8a18dae5a7e80c9e8c2f4891e02fae1b572269a53eef":["WDT-003",14],"252918974517975c47370c0c5e7deb0162e16d1d1e4fe0bed25866198142a87a":["WDT-003",15],"11de9433754a4170dca741fd6ea40ff411e7465501903edf5ccc658ecb301d0b":["WDT-003",16],"1c4f2b1f039b7513a856e6edd507f5d8dc721be1acd070ea7848bd716f2a6f18":["WDT-003",17],"3b5d3a0a20258333ea79b930924fb3dcdc3d127476dcf64a547729693afee9af":["WDT-003",18],"279c2dcd497a2ee7fe50f5888e2b308fb6d5cc11c5ed58692941ddd02f324122":["WDT-003",19],"9e2840df4b9fbeadb86341c534429eb3559d0299c4da1e8c63a398af01e6cdfa":["WDT-003",20],"6b4c0ab745011717e0808269c391456e9d7ffb8ccad39bc124fe6a2450396822":["WDT-003",21],"91871377044de2f34c98811071bb372475fbaccd43d2765b50c1ceb654ba5a8a":["WDT-003",22],"ca10dc0aabb60516fcc31afe4a1cdfc6540dc75da8c20911832e97a1133f1b7a":["WDT-003",23],"41949636c266e7eaca1ee8d4bc593a10c64eb2baea4361df2819da299fb0335b":["WDT-003",24],"cceca835901cdd7f4b0a00d08a2c28caa2ec49ab78f583a4c37cc88d0d10f29c":["WDT-003",25],"ded79663ad2a87000004ae62171d7a087dd80cbc876f436d9056228eb074707e":["WDT-004",1],"6b9654ce22f549699a5296ff82059e13a263b077e7ac6605843b296631c2b92f":["WDT-004",2],"78554477c0c82c8580a2764ccdf6ba1b214fdd8ff711b212a11c2ff5033670a9":["WDT-004",3],"80d2b56f026b7fe33a242fcb0659e3bcf67e66644fef977cec4df858a56f9328":["WDT-004",4],"c9b3a71606fb4d4af77de13d04f6a806b8e636904b04caf84277a2a2402331f7":["WDT-004",5],"0e4470934d72c686b8dcb4891f414bf1017e0dd8110883d42f7c4664cd5c8076":["WDT-004",6],"66140fbcf049a2f616c7c91ce19c2d2a11b7159e1fc4bb02ca41d1b7131b42b9":["WDT-004",7],"b04304827eeee488e4ab3b50c0037305bc172c94fc7a4a1c4cffd88d8b95e104":["WDT-004",8],"9163d718e61e003ea328c2fe526516e0e988fc6e579a6638e727b24538b92691":["WDT-004",9],"95eeec4c387190cc8f84a694848f9f3e034a4800f0e7bfd08ffa0fae3cdb7541":["WDT-004",10],"7e73534caf927306f31454ea685ed6029a5adeaffd8ce855c3da2c0e19db1e0c":["WDT-004",11],"92581f3086e945f67cab0103a60576120b8b15b29cd5ce4ad51709f92a900869":["WDT-004",12],"758f792d99ad26d8350a947c189869de378c9c8ec9e06b02022bdb20eb4ac482":["WDT-004",13],"23ab6d15192f294af17b3fabc3b84fb388aa98ef621d77943ffa5c8f6a1402e2":["WDT-004",14],"9326dcb8b84240d46c315959424ffa9b61e0397c508b7954b77e996f5de3b1b0":["WDT-004",15],"f8e3e3d85c0f59bd90f33c745082a6ce8f781be6b6e81cb589f7e69edfa3c69d":["WDT-004",16],"fef30c7c45a869fe34c59e8d096c61b6064e877cf3fada62eac22d3dfccafed2":["WDT-004",17],"5d76812db8f65e1975c9f8239f43a9fb49bc5008e6f4e7a5f0ae1cfac3f20aec":["WDT-004",18],"fb600365109cbc75697f834e4dd57161e5c1736918eced71b9e0d1cfb65ec798":["WDT-004",19],"25e06595d21c4b8feeed2ee97310bda9cd535d605181250d3fa768267a04ca8d":["WDT-004",20],"64de76370543ed4ad402331e0a82f794d7780df4f9984a262669d899e767fdfc":["WDT-004",21],"da8426f78ce4409d114770df261174f0dc8d8c30a5aaaf59e07f1e342c9dca6b":["WDT-004",22],"be62d94ee86fbd8a631b58bef266d2408f6b43855016f10c1cdd6b7c61c6b69c":["WDT-004",23],"c20653fbf4b15d9772f4cfcb946f2ea983d14c03fab0b6f08aeb2433e081ef77":["WDT-004",24],"e16df491f1e8791802d99d586e2cfcb5dd0c0db64026c4d84961f3f68a6f662f":["WDT-004",25]},"names":{"WDT-003":"Mandela Tee, Black","WDT-004":"Beanie, Black"}};
 const $=id=>document.getElementById(id);
 function show(id){["idle","ok","no"].forEach(s=>$(s).hidden=s!==id)}
 async function sha(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("")}
