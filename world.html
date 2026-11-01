@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>[w]orld | Where [w]strd. is worn</title>
+<link href="vendor/maplibre-gl.css" rel="stylesheet">
+<script defer src="vendor/maplibre-gl.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;800&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root{--orange:#ff7a1f;--bone:#ece5d6;--dim:#8d887c;--sans:"Montserrat","Helvetica Neue",Arial,sans-serif;--serif:"EB Garamond",Georgia,serif;
@@ -16,7 +18,8 @@ nav a{font-family:var(--sans);font-weight:800;letter-spacing:.2em;font-size:.95r
 header{text-align:center;padding:2rem 1.25rem 1rem}
 h1{font-family:var(--sans);font-weight:800;letter-spacing:.2em;padding-left:.2em;font-size:clamp(1.8rem,7vw,3.2rem);color:var(--orange);margin:0}
 header p{margin:.75rem auto 0;max-width:34ch;color:#cfc8b8}
-.map{position:relative;width:min(100% - 2rem,1200px);margin:2rem auto 0;aspect-ratio:180/69}
+.map{position:relative;width:min(100% - 2rem,1200px);margin:2rem auto 0;aspect-ratio:180/69;overflow:hidden;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.map.drag{cursor:grabbing}
 .map canvas{position:absolute;inset:0;width:100%;height:100%}
 .pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--orange);border:0;padding:0;cursor:pointer}
 .pin.home{background:var(--bone)}
@@ -34,6 +37,50 @@ header p{margin:.75rem auto 0;max-width:34ch;color:#cfc8b8}
 .legend i.h{background:var(--bone)}
 .rule{max-width:44ch;margin:2.5rem auto 0;padding:0 1.25rem;text-align:center;color:var(--dim);font-size:1.05rem}
 footer{padding:3rem 1.25rem 4rem;text-align:center;color:var(--dim);font-size:1rem}
+:root{color-scheme:light}
+body{background:#fbf9f5;color:#111}
+h1{color:#111}
+header p,.rule,footer,.cities,.legend{color:#6b675e}
+.pin.home{background:#111}.pin.home::before{border-color:#111}
+.pin span{background:#fbf9f5;color:#111;border-color:#d9d4c8}
+.legend i.h{background:#111}
+.jump{margin-top:1rem!important;font-size:1rem}
+.jump a{text-decoration:none;border-bottom:1px solid var(--orange)}
+.events{max-width:1000px;margin:4rem auto 0;padding:0 clamp(1.25rem,4vw,3rem)}
+.events h2{font:800 1rem var(--sans);letter-spacing:.2em;margin:0 0 1.5rem;text-align:center}
+.ev{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(1.5rem,4vw,3rem);align-items:center;border-top:1px solid #d9d4c8;padding:2rem 0}
+.ev img{width:100%;height:auto;display:block}
+.evno{font:800 .8rem var(--sans);letter-spacing:.18em;color:#b8520c;margin:0}
+.ev h3{font:800 clamp(1.6rem,4vw,2.4rem) var(--sans);letter-spacing:.02em;line-height:1.05;margin:.5rem 0 0}
+.evwith{font-style:italic;color:#6b675e;margin:.25rem 0 1.25rem}
+.ev dl{margin:0 0 1.25rem;display:grid;grid-template-columns:auto 1fr;gap:.35rem 1.25rem}
+.ev dt{font:800 .75rem var(--sans);letter-spacing:.16em;color:#6b675e;padding-top:.3rem}
+.ev dd{margin:0}
+.evres{font:800 .75rem var(--sans);letter-spacing:.16em;color:#6b675e;margin:0 0 .5rem}
+.ev .res a{display:inline-block;margin:.25rem .5rem 0 0;border:1px solid #111;padding:.5rem 1rem;text-decoration:none;font:800 .8rem var(--sans);letter-spacing:.06em;transition:background .3s,color .3s}
+.ev .res a:hover{background:#111;color:#fff}
+@media(prefers-reduced-motion:no-preference){.ev{animation:evin .9s cubic-bezier(.2,.7,.2,1) both}@keyframes evin{from{opacity:0;transform:translateY(16px)}}}
+.zoom{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:4px;z-index:3}
+.zoom button{min-width:34px;height:34px;padding:0 .5rem;background:#fbf9f5;border:1px solid #d9d4c8;color:#111;font:800 1rem var(--sans);cursor:pointer;transition:background .2s,color .2s}
+.zoom button:hover{background:#111;color:#fff}
+#zreset{font-size:.6rem;letter-spacing:.08em}
+.map.lbls .pin span{opacity:1}
+.hint{text-align:center;color:#6b675e;font-size:.95rem;margin:.75rem 0 0}
+.evmap{grid-column:1/-1;border:1px solid #d9d4c8;aspect-ratio:16/7;min-height:260px}
+.evmap iframe{width:100%;height:100%;border:0;display:block}
+.pin.evp{width:24px;height:24px;margin:-12px 0 0 -12px;background:transparent;border:2px solid var(--orange);border-radius:0}
+.pin.evp span{bottom:auto;top:calc(100% + 8px)}
+.pin.evp::before{border-radius:0}
+.legend i.e{background:#fbf9f5;border:2px solid var(--orange);border-radius:0;width:10px;height:10px}
+:root{--sage:#e4ebe1}
+#gl{position:absolute;inset:0;visibility:hidden}
+.map.gl{aspect-ratio:16/10;max-height:80vh;cursor:auto;background:var(--sage)}
+.map.gl #gl{visibility:visible}
+.map.gl #cv{display:none}
+.maplibregl-marker.pin{margin:0}
+.maplibregl-marker.pin.evp{margin:0;width:18px;height:18px;background:#fbf9f5}
+.maplibregl-ctrl-attrib{font-size:.7rem}
+.ev .res a[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -41,14 +88,22 @@ footer{padding:3rem 1.25rem 4rem;text-align:center;color:var(--dim);font-size:1r
 <header>
   <h1>[W]ORLD.</h1>
   <p>Everyone wearing [w]strd., pinned by city.</p>
+  <p class="jump"><a href="#events">See upcoming events</a></p>
 </header>
 
-<div class="map" id="map"><canvas id="cv" aria-hidden="true"></canvas></div>
+<div class="map" id="map"><div id="gl" aria-label="Map of where [w]strd. is worn and where events are held"></div><canvas id="cv" aria-hidden="true"></canvas>
+  <div class="zoom"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">&minus;</button><button type="button" id="zreset" aria-label="Reset the map view">RESET</button></div>
+</div>
+<p class="hint">Zoom with + and &minus;, pinch, or Ctrl + scroll. Drag to move.</p>
 
 <section class="info">
   <p class="count" id="count"></p>
   <ul class="cities" id="cities"></ul>
   <div class="legend"><span><i class="h"></i>Where it starts</span><span><i></i>Wearers</span></div>
+</section>
+<section class="events" id="events">
+  <h2>UPCOMING</h2>
+  <div id="evlist"></div>
 </section>
 <p class="rule">Pinned by city only, never a street and never a name. Nobody appears here unless they asked to.</p>
 <footer>[w]strd. Mahikeng &nbsp;&nbsp; <a href="shop.html">Shop</a></footer>
@@ -61,14 +116,53 @@ const PINS=[
 ];
 const bits=(()=>{const s=atob(GRID),o=[];for(let i=0;i<s.length;i++){const b=s.charCodeAt(i);for(let j=7;j>=0;j--)o.push((b>>j)&1)}return o})();
 const cv=document.getElementById("cv"),map=document.getElementById("map");
+const V={z:1,x:0,y:0},PINEL=[];
+function clampV(){const w=map.clientWidth,h=map.clientHeight;V.z=Math.min(8,Math.max(1,V.z));V.x=Math.min(0,Math.max(w-w*V.z,V.x));V.y=Math.min(0,Math.max(h-h*V.z,V.y))}
+function placePins(){const w=map.clientWidth,h=map.clientHeight;PINEL.forEach(o=>{o.el.style.left=((o.p.lon+180)/360*w*V.z+V.x)+"px";o.el.style.top=((80-o.p.lat)/138*h*V.z+V.y)+"px"})}
+let GL=null,HOME=null;
+function mount(el,lat,lon){
+  if(GL){new maplibregl.Marker({element:el}).setLngLat([lon,lat]).addTo(GL)}
+  else{PINEL.push({el:el,p:{lat:lat,lon:lon}});map.appendChild(el);placePins()}
+}
 function draw(){
+  clampV();
   const w=map.clientWidth,h=map.clientHeight,d=window.devicePixelRatio||1;
   cv.width=w*d;cv.height=h*d;
   const x=cv.getContext("2d");x.scale(d,d);x.clearRect(0,0,w,h);
-  const cw=w/C,ch=h/R,r=Math.max(.7,cw*.34);
-  x.fillStyle="#3a3732";
-  for(let i=0;i<R;i++)for(let j=0;j<C;j++)if(bits[i*C+j]){x.beginPath();x.arc((j+.5)*cw,(i+.5)*ch,r,0,6.2832);x.fill()}
+  const cw=w/C*V.z,ch=h/R*V.z,r=Math.max(.7,cw*.34);
+  x.fillStyle="#cfc9bb";
+  for(let i=0;i<R;i++){const py=(i+.5)*ch+V.y;if(py<-r||py>h+r)continue;
+    for(let j=0;j<C;j++){if(!bits[i*C+j])continue;const px=(j+.5)*cw+V.x;if(px<-r||px>w+r)continue;x.beginPath();x.arc(px,py,r,0,6.2832);x.fill()}}
+  placePins();
+  map.classList.toggle("lbls",V.z>=2.5);
+  map.style.touchAction=V.z>1?"none":"pan-y";
 }
+function zoomAt(f,cx,cy){const z0=V.z;V.z=Math.min(8,Math.max(1,V.z*f));const k=V.z/z0;V.x=cx-(cx-V.x)*k;V.y=cy-(cy-V.y)*k;draw()}
+function mid(){return[map.clientWidth/2,map.clientHeight/2]}
+document.getElementById("zin").addEventListener("click",()=>{if(GL){GL.zoomIn();return}const c=mid();zoomAt(1.6,c[0],c[1])});
+document.getElementById("zout").addEventListener("click",()=>{if(GL){GL.zoomOut();return}const c=mid();zoomAt(1/1.6,c[0],c[1])});
+document.getElementById("zreset").addEventListener("click",()=>{if(GL){GL.flyTo({center:HOME.center,zoom:HOME.zoom,duration:1400});return}V.z=1;V.x=0;V.y=0;draw()});
+map.addEventListener("wheel",e=>{if(map.classList.contains("gl")||!(e.ctrlKey||e.metaKey))return;e.preventDefault();const r=map.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*0.01),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+map.addEventListener("dblclick",e=>{if(map.classList.contains("gl")||e.target.closest(".zoom"))return;const r=map.getBoundingClientRect();zoomAt(2,e.clientX-r.left,e.clientY-r.top)});
+const ptrs=new Map();
+map.addEventListener("pointerdown",e=>{if(map.classList.contains("gl")||e.target.closest(".zoom"))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY})});
+map.addEventListener("pointermove",e=>{
+  if(!ptrs.has(e.pointerId))return;
+  const prev=ptrs.get(e.pointerId),cur={x:e.clientX,y:e.clientY};
+  if(ptrs.size===1){
+    if(V.z>1){
+      if(Math.hypot(cur.x-prev.x,cur.y-prev.y)<1)return;
+      if(!map.hasPointerCapture(e.pointerId))map.setPointerCapture(e.pointerId);
+      map.classList.add("drag");V.x+=cur.x-prev.x;V.y+=cur.y-prev.y;ptrs.set(e.pointerId,cur);draw()}
+    else ptrs.set(e.pointerId,cur)}
+  else if(ptrs.size===2){
+    const other=Array.from(ptrs.entries()).find(a=>a[0]!==e.pointerId)[1];
+    const d0=Math.hypot(prev.x-other.x,prev.y-other.y),d1=Math.hypot(cur.x-other.x,cur.y-other.y);
+    ptrs.set(e.pointerId,cur);
+    if(d0>0){const r=map.getBoundingClientRect();zoomAt(d1/d0,(cur.x+other.x)/2-r.left,(cur.y+other.y)/2-r.top)}}
+});
+function endPtr(e){ptrs.delete(e.pointerId);if(!ptrs.size)map.classList.remove("drag")}
+map.addEventListener("pointerup",endPtr);map.addEventListener("pointercancel",endPtr);
 new ResizeObserver(draw).observe(map);draw();
 const SB_URL="https://pmzbygzorusmoewoutzh.supabase.co",SB_KEY="sb_publishable_DwaQ3eh0nGZ20IEIs_9tsQ_lP2K4ZfT";
 const list=document.getElementById("cities");
@@ -76,8 +170,7 @@ const em=document.createElement("li");em.id="empty";em.textContent="The first pi
 function addPin(p){
   const b=document.createElement("button");
   b.className="pin"+(p.home?" home":"");b.type="button";b.setAttribute("aria-label",p.c);
-  b.style.left=((p.lon+180)/360*100)+"%";b.style.top=((80-p.lat)/138*100)+"%";
-  const s=document.createElement("span");s.textContent=p.c;b.appendChild(s);map.appendChild(b);
+  const s=document.createElement("span");s.textContent=p.c;b.appendChild(s);mount(b,p.lat,p.lon);
   if(!p.home){const li=document.createElement("li");li.textContent=p.c;list.appendChild(li)}
 }
 function summary(){
@@ -87,6 +180,101 @@ function summary(){
 }
 PINS.forEach(addPin);summary();
 if(SB_URL&&SB_KEY)fetch(SB_URL+"/rest/v1/pins?select=city,lat,lon&approved=eq.true",{headers:{apikey:SB_KEY,...(SB_KEY.startsWith("eyJ")?{Authorization:"Bearer "+SB_KEY}:{})}}).then(r=>r.ok?r.json():[]).then(rows=>{rows.forEach(r=>{const p={c:r.city,lat:r.lat,lon:r.lon};PINS.push(p);addPin(p)});summary()}).catch(()=>{});
+const EVENTS=[
+  {n:"001",title:"[w]strd land",with:"x El Forgero",date:"",time:"11:00 to midnight",venue:"Seremane Street, Montshioa",address:"Seremane Street, Montshioa, Mahikeng, 2737",lat:-25.84257,lon:25.62047,entry:"Free entry",flyer:"flyer-001.jpg",tel:["0670407792","082 688 0679","084 870 4251"]}
+];
+(function(){
+  const box=document.getElementById("evlist");
+  function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+  if(!EVENTS.length){box.appendChild(el("p","",""));box.firstChild.style.textAlign="center";box.firstChild.textContent="No events announced yet.";return}
+  EVENTS.forEach(e=>{
+    const card=el("article","ev");
+    if(e.flyer){const im=el("img");im.src=e.flyer;im.alt="Poster for "+e.n+" "+e.title+" "+e.with;card.appendChild(im)}
+    const d=el("div");
+    d.appendChild(el("p","evno",e.n));
+    d.appendChild(el("h3","",e.title));
+    d.appendChild(el("p","evwith",e.with));
+    const dl=el("dl");
+    [["DATE",e.date||"To be confirmed"],["TIME",e.time||"To be confirmed"],["VENUE",e.venue||"To be confirmed"],["ENTRY",e.entry||""]].forEach(r=>{if(r[1]){dl.appendChild(el("dt","",r[0]));dl.appendChild(el("dd","",r[1]))}});
+    d.appendChild(dl);
+    if(e.tel&&e.tel.length){
+      d.appendChild(el("p","evres","TABLE RESERVATIONS"));
+      const res=el("div","res");
+      e.tel.forEach(t=>{const a=el("a","",t);a.href="tel:"+t.replace(/\s/g,"").replace(/^0/,"+27");res.appendChild(a)});
+      d.appendChild(res)}
+    const hasXY=typeof e.lat==="number"&&typeof e.lon==="number";
+    const q=hasXY?e.lat+","+e.lon:(e.address?encodeURIComponent(e.address):"");
+    if(q){
+      d.appendChild(el("p","evres","GET THERE"));
+      const g=el("div","res");
+      [["Directions","https://www.google.com/maps/dir/?api=1&destination="+q],
+       ["Google Maps","https://www.google.com/maps/search/?api=1&query="+q],
+       ["Apple Maps",hasXY?"https://maps.apple.com/?ll="+q+"&q="+encodeURIComponent(e.venue||e.title):"https://maps.apple.com/?q="+q],
+       ["Waze",hasXY?"https://waze.com/ul?ll="+q+"&navigate=yes":"https://waze.com/ul?q="+q]].forEach(r=>{
+        const a=el("a","",r[0]);a.href=r[1];a.target="_blank";a.rel="noopener";g.appendChild(a)});
+      if(hasXY){const sm=el("a","showmap","Show on [w]orld");sm.href="#map";sm.hidden=true;
+        sm.addEventListener("click",ev=>{ev.preventDefault();if(GL){map.scrollIntoView({behavior:"smooth",block:"center"});GL.flyTo({center:[e.lon,e.lat],zoom:14.5,duration:2400})}});
+        g.appendChild(sm)}
+      d.appendChild(g)}
+    else d.appendChild(el("p","evwith","The exact location will be posted here and on the map as soon as it’s confirmed."));
+    card.appendChild(d);
+    if(hasXY){
+      const m=el("div","evmap"),f=el("iframe");
+      f.loading="lazy";f.title="Map of "+(e.venue||e.title);
+      f.src="https://www.openstreetmap.org/export/embed.html?bbox="+[e.lon-.01,e.lat-.006,e.lon+.01,e.lat+.006].join("%2C")+"&layer=mapnik&marker="+e.lat+"%2C"+e.lon;
+      m.appendChild(f);card.appendChild(m);
+      const b=el("button","pin evp");b.type="button";b.setAttribute("aria-label",e.n+" "+e.title);
+      b.appendChild(el("span","",e.n+" "+e.title));mount(b,e.lat,e.lon);
+      if(!document.getElementById("evleg")){const sp=el("span");sp.id="evleg";sp.appendChild(el("i","e"));sp.appendChild(document.createTextNode("Events"));document.querySelector(".legend").appendChild(sp)}}
+    box.appendChild(card)});
+})();
+
+/* Real street map in the sage poster style. Falls back to the dot map if it can't load. */
+function restyle(m){
+  const BG="#e4ebe1",WATER="#d1ddd0",GREEN="#dae4d7",ROAD="#58765f",MINOR="#7d9886",TEXT="#2c4a3a",HALO="#e4ebe1";
+  m.getStyle().layers.forEach(l=>{
+    const id=l.id,ty=l.type;
+    const P=(k,v)=>{try{m.setPaintProperty(id,k,v)}catch(e){}},L=(k,v)=>{try{m.setLayoutProperty(id,k,v)}catch(e){}};
+    try{
+      if(ty==="background")P("background-color",BG);
+      else if(ty==="fill-extrusion")L("visibility","none");
+      else if(ty==="fill"){
+        if(/building/.test(id))L("visibility","none");
+        else if(/water/.test(id))P("fill-color",WATER);
+        else if(/park|wood|forest|grass|landcover|nature|green|garden|cemetery|golf|pitch|scrub/.test(id))P("fill-color",GREEN);
+        else P("fill-color",BG);
+        P("fill-outline-color","rgba(0,0,0,0)")}
+      else if(ty==="line"){
+        if(/casing|outline/.test(id))L("visibility","none");
+        else if(/waterway|river|stream|canal/.test(id)){P("line-color","#b9cbb9")}
+        else if(/boundary|admin|border/.test(id)){P("line-color","#9db5a4");P("line-opacity",0.8)}
+        else{
+          const major=/motorway|trunk|primary|major/.test(id),rail=/rail|transit|aeroway|runway|taxiway/.test(id);
+          P("line-color",rail?MINOR:ROAD);P("line-opacity",major?1:0.9);
+          P("line-width",["interpolate",["exponential",1.5],["zoom"],4,major?0.5:0.2,10,major?0.9:0.4,14,major?1.8:0.9,18,major?6:3.2])}}
+      else if(ty==="symbol"){
+        if(/(^|[_-])poi([_-]|$)|housenumber|house_number|shield|airport|aerodrome|transport|rail|ferry|highway-name|road|street|path|contour/.test(id))L("visibility","none");
+        else{P("text-color",TEXT);P("text-halo-color",HALO);P("text-halo-width",1.4);L("text-letter-spacing",0.08)}}
+    }catch(e){}
+  });
+}
+function initGL(){
+  if(!window.maplibregl)return;
+  try{
+    const w=map.clientWidth||900,z0=Math.max(0.5,Math.log2(w/512)-0.05);
+    HOME={center:[12,20],zoom:z0};
+    const m=new maplibregl.Map({container:"gl",style:"https://tiles.openfreemap.org/styles/positron",center:HOME.center,zoom:z0,minZoom:Math.max(0.4,z0-0.4),maxZoom:18,cooperativeGestures:true,dragRotate:false,pitchWithRotate:false,attributionControl:{compact:true}});
+    m.touchZoomRotate.disableRotation();
+    m.on("error",()=>{});
+    m.once("load",()=>{
+      restyle(m);GL=m;map.classList.add("gl");
+      PINEL.splice(0).forEach(o=>{o.el.style.left="";o.el.style.top="";new maplibregl.Marker({element:o.el}).setLngLat([o.p.lon,o.p.lat]).addTo(m)});
+      document.querySelectorAll(".showmap").forEach(a=>{a.hidden=false});
+      const hint=document.querySelector(".hint");if(hint)hint.textContent="Zoom with + and −. Use two fingers, or Ctrl + scroll, to move around.";
+      m.resize()});
+  }catch(e){}
+}
+window.addEventListener("load",initGL);
 </script>
 </body>
 </html>
