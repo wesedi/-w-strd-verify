@@ -166,5 +166,58 @@ const BEANIE_LINK="",BEANIE_PRICE="";
 (function(){const b=document.getElementById("buy2");
   if(BEANIE_LINK){b.href=BEANIE_LINK;b.textContent="BUY"+(BEANIE_PRICE?" "+BEANIE_PRICE:"");b.removeAttribute("aria-disabled")}})();
 </script>
+  <!-- ===== [w]strd. NEW TEES: paste this on its own line just above </body> in shop.html ===== -->
+<style>
+.more .nfc{font-size:1rem;color:#6b675e;font-style:italic;margin:0 0 1.25rem}
+.tee-stack img{position:absolute;inset:0;transition:opacity .7s}
+.tee-stack .b{opacity:0}
+.tee-stack.showback .b{opacity:1}
+.tee-stack.showback .f{opacity:0}
+</style>
+
+<section class="more" id="spinfest">
+  <div class="gal">
+    <div class="pic"><div class="stack tee-stack" id="sf-stack">
+      <img class="f" src="wstrd-tee-front.webp" alt="Black tee with red [W]STRD. logo on the chest" loading="lazy">
+      <img class="b" src="spinfest-tee-back.webp" alt="Back of the black tee: SPIN-FEST in red above a three-panel sunset spin scene" loading="lazy">
+    </div></div>
+    <div class="views" id="sf-views">
+      <button type="button" data-v="front" aria-pressed="true">FRONT</button>
+      <button type="button" data-v="back" aria-pressed="false">BACK</button>
+    </div>
+  </div>
+  <div>
+    <h2>[W]STRD. x SPIN-FEST TEE</h2>
+    <p class="sub">Black</p>
+    <p>Red [W]STRD. logo on the front. On the back, SPIN-FEST in red over a three-panel sunset spin scene.</p>
+    <p class="nfc">NFC-tagged. Tap the tag to confirm it’s genuine.</p>
+    <a class="buy" data-tee="spinfest" target="_blank" rel="noopener" aria-disabled="true">ORDERS OPEN SOON</a>
+  </div>
+</section>
+
+<section class="more" id="tee-white">
+  <div class="pic"><img src="wstrd-tee-white.webp" alt="White tee with red [W]STRD. MAHIKENG logo on the chest and an orange hang tag" loading="lazy"></div>
+  <div>
+    <h2>[W]STRD. TEE</h2>
+    <p class="sub">White</p>
+    <p>White tee, red [W]STRD. logo with MAHIKENG beneath, centre chest.</p>
+    <p class="nfc">NFC-tagged. Tap the tag to confirm it’s genuine.</p>
+    <a class="buy" data-tee="white" target="_blank" rel="noopener" aria-disabled="true">ORDERS OPEN SOON</a>
+  </div>
+</section>
+
+<script>
+/* Paste each tee's Yoco payment link between the quotes. Empty = shows "ORDERS OPEN SOON". */
+const TEE_LINKS={spinfest:"",white:""};
+document.querySelectorAll("[data-tee]").forEach(a=>{
+  const l=TEE_LINKS[a.dataset.tee];
+  if(l){a.href=l;a.textContent="BUY";a.removeAttribute("aria-disabled")}
+});
+document.querySelectorAll("#sf-views button").forEach(b=>b.addEventListener("click",()=>{
+  document.getElementById("sf-stack").classList.toggle("showback",b.dataset.v==="back");
+  document.querySelectorAll("#sf-views button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+}));
+</script>
+<!-- ===== end of new tees ===== -->
 </body>
 </html>
